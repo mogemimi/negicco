@@ -3,6 +3,9 @@
 *.so
 .DS_Store
 
+negicco
+negicco.xcodeproj
+
 ## CMake
 CMakeCache.txt
 CMakeFiles
