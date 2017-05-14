@@ -29,7 +29,7 @@ make build CLANG_DIR=/path/to/your/dir//clang+llvm-3.9.0-x86_64-apple-darwin
 #### Get variables and comments from source code
 
 ```shell
-.negicco main.cpp --
+.negicco tests/enum_class.cpp -- -std=c++14
 ```
 
 Result:
