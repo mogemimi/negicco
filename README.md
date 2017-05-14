@@ -26,7 +26,7 @@ make build CLANG_DIR=/path/to/your/dir//clang+llvm-3.9.0-x86_64-apple-darwin
 
 ## Running the application
 
-#### Get variables and comments from source code
+#### Get enum definitions and comments from source code
 
 ```shell
 .negicco tests/enum_class.cpp -- -std=c++14
@@ -35,11 +35,79 @@ make build CLANG_DIR=/path/to/your/dir//clang+llvm-3.9.0-x86_64-apple-darwin
 Result:
 
 ```shell
-42
-/path/to/negicco/main.cpp:10:10: fatal error: 'clang/AST/AST.h' file
-      not found
-#include "clang/AST/AST.h"
-         ^
-1 error generated.
-Error while processing /path/to/negicco/main.cpp.
+- DeclName: Color
+  Style: Scoped (C++11)
+  IntegerType: int
+  QualifiedName: negicco::Color
+  Location: /path/tonegicco/tests/enum_class.cpp:3:1
+  Members:
+    - Name: Red
+      Value: 0
+    - Name: Yellow
+      Value: 1
+    - Name: Blue
+      Value: 2
+
+- DeclName: Animal
+  Style: Scoped (C++11)
+  IntegerType: int
+  QualifiedName: negicco::Animal
+  Location: /path/to/negicco/tests/enum_class.cpp:10:1
+  Comments:
+    - @brief Hello, this is enum
+  Members:
+    - Name: Dog
+      Value: 42
+    - Name: Cat
+      Value: 100
+    - Name: Fish
+      Value: 3
+
+- DeclName: CStyleEnum
+  Style: C-Style
+  IntegerType: unsigned int
+  QualifiedName: negicco::CStyleEnum
+  Location: /path/to/negicco/tests/enum_class.cpp:20:1
+  Comments:
+    - @brief C-style enum definition
+    - @details This is detail comment
+  Members:
+    - Name: One
+      Value: 0
+    - Name: Two
+      Value: 1
+    - Name: Three
+      Value: 2
+
+- DeclName: UnsignedCharEnum
+  Style: Scoped (C++11)
+  IntegerType: unsigned char
+  QualifiedName: negicco::UnsignedCharEnum
+  Location: /path/to/negicco/tests/enum_class.cpp:26:1
+  Members:
+    - Name: One
+      Value: 1
+      Comments:
+        - @brief Hello one
+    - Name: Two
+      Value: 2
+      Comments:
+        - @brief Good morning two!
+    - Name: Three
+      Value: 3
+      Comments:
+        - @brief Hi three!!
+
+- DeclName: Buki
+  Style: Scoped (C++11)
+  IntegerType: int
+  QualifiedName: negicco::Fire::Ninja::Buki
+  Location: /path/to/negicco/tests/enum_class.cpp:37:9
+  Members:
+    - Name: Shuriken
+      Value: 0
+    - Name: Katana
+      Value: 1
+    - Name: Makibishi
+      Value: 2
 ```
