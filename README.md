@@ -32,6 +32,12 @@ make build CLANG_DIR=/path/to/your/dir//clang+llvm-3.9.0-x86_64-apple-darwin
 .negicco tests/enum_class.cpp -- -std=c++14
 ```
 
+or
+
+```shell
+.negicco <sources ...> -- <compilation-options-of-clang ...>
+```
+
 Result:
 
 ```shell
@@ -39,7 +45,7 @@ Result:
   Style: Scoped (C++11)
   IntegerType: int
   QualifiedName: negicco::Color
-  Location: /path/tonegicco/tests/enum_class.cpp:3:1
+  Location: /path/to/negicco/tests/enum_class.cpp:3:1
   Members:
     - Name: Red
       Value: 0
