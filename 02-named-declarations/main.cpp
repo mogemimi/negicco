@@ -53,7 +53,8 @@ std::string GetLocation(clang::SourceLocation location,
     return ss.str();
 }
 
-class NamedDeclVisitor final : public clang::RecursiveASTVisitor<NamedDeclVisitor> {
+class NamedDeclVisitor final
+    : public clang::RecursiveASTVisitor<NamedDeclVisitor> {
 private:
     clang::SourceManager& sourceManager;
 
@@ -66,9 +67,13 @@ public:
     bool VisitNamedDecl(clang::NamedDecl* namedDecl)
     {
         llvm::outs() << "- DeclName: " << namedDecl->getDeclName() << "\n"
-                     << "  QualifiedName: " << namedDecl->getQualifiedNameAsString() << "\n"
+                     << "  QualifiedName: "
+                     << namedDecl->getQualifiedNameAsString() << "\n"
                      << "  Kind: " << namedDecl->getDeclKindName() << "\n"
-                     << "  At: \"" << GetLocation(namedDecl->getLocStart(), sourceManager) << "\"" << "\n"
+                     << "  At: \""
+                     << GetLocation(namedDecl->getLocStart(), sourceManager)
+                     << "\""
+                     << "\n"
                      << "\n";
         return true;
     }
@@ -112,8 +117,8 @@ public:
     {
     }
 
-    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& ci,
-                                                   StringRef file) override
+    std::unique_ptr<clang::ASTConsumer>
+    CreateASTConsumer(clang::CompilerInstance& ci, StringRef file) override
     {
         return std::make_unique<MyASTConsumer>(printer, ci.getSourceManager(),
                                                ci.getPreprocessor());
@@ -123,7 +128,8 @@ private:
     MyPrinter& printer;
 };
 
-class MyFrontendActionFactory final : public clang::tooling::FrontendActionFactory {
+class MyFrontendActionFactory final
+    : public clang::tooling::FrontendActionFactory {
 public:
     explicit MyFrontendActionFactory(MyPrinter& printerIn)
         : printer(printerIn)

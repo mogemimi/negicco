@@ -16,7 +16,7 @@ tar xaf clang+llvm-3.9.0-x86_64-apple-darwin
 
 ```shell
 git clone https://github.com/mogemimi/negicco.git
-cd negicco/04-enum-classes
+cd negicco/05-enum-classes
 
 # Compiling for any platforms
 make build CLANG_DIR=/path/to/your/dir/clang+llvm-3.9.0
@@ -41,12 +41,12 @@ or
 
 Result:
 
-```shell
+```yaml
 - DeclName: Color
   Style: Scoped (C++11)
   IntegerType: int
   QualifiedName: negicco::Color
-  Location: /path/to/negicco/tests/enum_class.cpp:3:1
+  Location: "/path/to/negicco/05-enum-classes/test/enum_class.cpp:3:1"
   Members:
     - Name: Red
       Value: 0
@@ -59,7 +59,7 @@ Result:
   Style: Scoped (C++11)
   IntegerType: int
   QualifiedName: negicco::Animal
-  Location: /path/to/negicco/tests/enum_class.cpp:10:1
+  Location: "/path/to/negicco/05-enum-classes/test/enum_class.cpp:10:1"
   Comments:
     - @brief Hello, this is enum
   Members:
@@ -74,7 +74,7 @@ Result:
   Style: C-Style
   IntegerType: unsigned int
   QualifiedName: negicco::CStyleEnum
-  Location: /path/to/negicco/tests/enum_class.cpp:20:1
+  Location: "/path/to/negicco/05-enum-classes/test/enum_class.cpp:20:1"
   Comments:
     - @brief C-style enum definition
     - @details This is detail comment
@@ -90,7 +90,7 @@ Result:
   Style: Scoped (C++11)
   IntegerType: unsigned char
   QualifiedName: negicco::UnsignedCharEnum
-  Location: /path/to/negicco/tests/enum_class.cpp:26:1
+  Location: "/path/to/negicco/05-enum-classes/test/enum_class.cpp:26:1"
   Members:
     - Name: One
       Value: 1
@@ -109,7 +109,7 @@ Result:
   Style: Scoped (C++11)
   IntegerType: int
   QualifiedName: negicco::Fire::Ninja::Buki
-  Location: /path/to/negicco/tests/enum_class.cpp:37:9
+  Location: "/path/to/negicco/05-enum-classes/test/enum_class.cpp:37:9"
   Members:
     - Name: Shuriken
       Value: 0

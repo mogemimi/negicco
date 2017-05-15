@@ -13,21 +13,16 @@
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/Comment.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
-#include "clang/Basic/Version.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
-#include "llvm/ADT/StringMap.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/FileSystem.h"
-#include "llvm/Support/Signals.h"
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -37,23 +32,12 @@
 
 #include <sstream>
 
-using namespace clang;
-using namespace clang::ast_matchers;
-using namespace clang::driver;
-using namespace clang::tooling;
-using namespace llvm;
+using clang::tooling::CommonOptionsParser;
+using clang::tooling::ClangTool;
 
 namespace {
 
-cl::OptionCategory MyToolCategory("negicco options");
-cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
-cl::extrahelp MoreHelp("\nMore help text...");
-
-constexpr auto MyToolUsage = "negicco <source file>";
-
-} // end anonymous namespace
-
-namespace {
+llvm::cl::OptionCategory MyToolCategory("negicco options");
 
 class MyPrinter final {
 public:
@@ -105,26 +89,28 @@ public:
             return true;
         }
 
-        llvm::outs() << "- DeclName: "
-                     << enumDecl->getDeclName().getAsString() << "\n"
+        llvm::outs() << "- DeclName: " << enumDecl->getDeclName().getAsString()
+                     << "\n"
                      << "  Style: "
                      << (enumDecl->isScoped() ? "Scoped (C++11)" : "C-Style")
                      << "\n"
                      << "  IntegerType: "
                      << enumDecl->getIntegerType().getAsString() << "\n"
-                     << "  QualifiedName: " << enumDecl->getQualifiedNameAsString()
-                     << "\n"
-                     << "  Location: "
+                     << "  QualifiedName: "
+                     << enumDecl->getQualifiedNameAsString() << "\n"
+                     << "  Location: \""
                      << GetLocation(enumDecl->getLocStart(), sourceManager)
+                     << "\""
                      << "\n";
 
         if (auto comments = context.getCommentForDecl(enumDecl, &pp)) {
             if (!comments->getBlocks().empty()) {
-                llvm::outs() << "  Comments:" << "\n";
+                llvm::outs() << "  Comments:"
+                             << "\n";
             }
             for (auto block : comments->getBlocks()) {
-                llvm::outs() << "    - " << GetComment(pp, block->getSourceRange())
-                             << "\n";
+                llvm::outs() << "    - "
+                             << GetComment(pp, block->getSourceRange()) << "\n";
             }
         }
 
@@ -132,10 +118,12 @@ public:
         for (auto iter : enumDecl->enumerators()) {
             assert(iter->getDeclName() && "EnumConstantDecl with no name?");
             llvm::outs() << "    - Name: " << iter->getDeclName() << "\n"
-                         << "      Value: " << iter->getInitVal().toString(10) << "\n";
+                         << "      Value: " << iter->getInitVal().toString(10)
+                         << "\n";
             if (auto comments = context.getCommentForDecl(iter, &pp)) {
                 if (!comments->getBlocks().empty()) {
-                    llvm::outs() << "      Comments:" << "\n";
+                    llvm::outs() << "      Comments:"
+                                 << "\n";
                 }
                 for (auto block : comments->getBlocks()) {
                     llvm::outs() << "        - "
@@ -150,7 +138,7 @@ public:
     }
 };
 
-class MyASTConsumer final : public ASTConsumer {
+class MyASTConsumer final : public clang::ASTConsumer {
 private:
     MyPrinter& printer;
     clang::SourceManager& sourceManager;
@@ -165,7 +153,7 @@ public:
     {
     }
 
-    void HandleTranslationUnit(ASTContext& context) override
+    void HandleTranslationUnit(clang::ASTContext& context) override
     {
         EnumDeclVisitor visitor(sourceManager, context, pp);
 
@@ -181,15 +169,16 @@ public:
     }
 };
 
-class MyFrontendAction final : public ASTFrontendAction {
+class MyFrontendAction final : public clang::ASTFrontendAction {
 public:
     explicit MyFrontendAction(MyPrinter& printerIn)
         : printer(printerIn)
     {
     }
 
-    std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& ci,
-                                                   StringRef file) override
+    std::unique_ptr<clang::ASTConsumer>
+    CreateASTConsumer(clang::CompilerInstance& ci,
+                      clang::StringRef file) override
     {
         return std::make_unique<MyASTConsumer>(printer, ci.getSourceManager(),
                                                ci.getPreprocessor());
@@ -199,7 +188,8 @@ private:
     MyPrinter& printer;
 };
 
-class MyFrontendActionFactory final : public FrontendActionFactory {
+class MyFrontendActionFactory final
+    : public clang::tooling::FrontendActionFactory {
 public:
     explicit MyFrontendActionFactory(MyPrinter& printerIn)
         : printer(printerIn)
@@ -219,11 +209,7 @@ private:
 
 int main(int argc, const char** argv)
 {
-    using clang::tooling::CommonOptionsParser;
-    using clang::tooling::ClangTool;
-
-    CommonOptionsParser options(argc, argv, MyToolCategory, MyToolUsage);
-    options.getCompilations();
+    CommonOptionsParser options(argc, argv, MyToolCategory);
     ClangTool tool(options.getCompilations(), options.getSourcePathList());
 
     MyPrinter printer;
