@@ -20,19 +20,25 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include <sstream>
+
+using clang::tooling::CommonOptionsParser;
+using clang::tooling::ClangTool;
+using clang::tooling::newFrontendActionFactory;
+
 namespace {
 
 llvm::cl::OptionCategory MyToolCategory("My Tool Options");
+llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
+llvm::cl::extrahelp MoreHelp("More help text...\n");
+
+constexpr auto MyToolUsage = "negicco <source file>";
 
 } // end anonymous namespace
 
 int main(int argc, const char** argv)
 {
-    using clang::tooling::CommonOptionsParser;
-    using clang::tooling::ClangTool;
-    using clang::tooling::newFrontendActionFactory;
-
-    CommonOptionsParser options(argc, argv, MyToolCategory);
+    CommonOptionsParser options(argc, argv, MyToolCategory, MyToolUsage);
     ClangTool tool(options.getCompilations(), options.getSourcePathList());
     return tool.run(newFrontendActionFactory<clang::SyntaxOnlyAction>().get());
 }

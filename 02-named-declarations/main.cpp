@@ -11,23 +11,17 @@
 
 #include "clang/AST/AST.h"
 #include "clang/AST/ASTConsumer.h"
-#include "clang/AST/Comment.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
-#include "clang/Basic/Version.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
-#include "llvm/ADT/StringMap.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/FileSystem.h"
-#include "llvm/Support/Signals.h"
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -37,23 +31,12 @@
 
 #include <sstream>
 
-using namespace clang;
-using namespace clang::ast_matchers;
-using namespace clang::driver;
-using namespace clang::tooling;
-using namespace llvm;
+using clang::tooling::CommonOptionsParser;
+using clang::tooling::ClangTool;
 
 namespace {
 
-cl::OptionCategory MyToolCategory("negicco options");
-cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
-cl::extrahelp MoreHelp("\nMore help text...");
-
-constexpr auto MyToolUsage = "negicco <source file>";
-
-} // end anonymous namespace
-
-namespace {
+llvm::cl::OptionCategory MyToolCategory("My Tool Options");
 
 class MyPrinter final {
 public:
@@ -75,21 +58,23 @@ private:
     clang::SourceManager& sourceManager;
 
 public:
-    NamedDeclVisitor(clang::SourceManager& sourceManagerIn)
+    explicit NamedDeclVisitor(clang::SourceManager& sourceManagerIn)
         : sourceManager(sourceManagerIn)
     {
     }
 
     bool VisitNamedDecl(clang::NamedDecl* namedDecl)
     {
-        llvm::outs() << namedDecl->getQualifiedNameAsString() << "\n"
-                     << " at " << GetLocation(namedDecl->getLocStart(), sourceManager)
+        llvm::outs() << "- DeclName: " << namedDecl->getDeclName() << "\n"
+                     << "  QualifiedName: " << namedDecl->getQualifiedNameAsString() << "\n"
+                     << "  Kind: " << namedDecl->getDeclKindName() << "\n"
+                     << "  At: \"" << GetLocation(namedDecl->getLocStart(), sourceManager) << "\"" << "\n"
                      << "\n";
         return true;
     }
 };
 
-class MyASTConsumer final : public ASTConsumer {
+class MyASTConsumer final : public clang::ASTConsumer {
 private:
     MyPrinter& printer;
     clang::SourceManager& sourceManager;
@@ -104,9 +89,9 @@ public:
     {
     }
 
-    void HandleTranslationUnit(ASTContext& context) override
+    void HandleTranslationUnit(clang::ASTContext& context) override
     {
-        NamedDeclVisitor visitor(sourceManager, context, pp);
+        NamedDeclVisitor visitor(sourceManager);
 
         auto decls = context.getTranslationUnitDecl()->decls();
         for (auto& decl : decls) {
@@ -120,14 +105,14 @@ public:
     }
 };
 
-class MyFrontendAction final : public ASTFrontendAction {
+class MyFrontendAction final : public clang::ASTFrontendAction {
 public:
     explicit MyFrontendAction(MyPrinter& printerIn)
         : printer(printerIn)
     {
     }
 
-    std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& ci,
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& ci,
                                                    StringRef file) override
     {
         return std::make_unique<MyASTConsumer>(printer, ci.getSourceManager(),
@@ -138,7 +123,7 @@ private:
     MyPrinter& printer;
 };
 
-class MyFrontendActionFactory final : public FrontendActionFactory {
+class MyFrontendActionFactory final : public clang::tooling::FrontendActionFactory {
 public:
     explicit MyFrontendActionFactory(MyPrinter& printerIn)
         : printer(printerIn)
@@ -158,11 +143,7 @@ private:
 
 int main(int argc, const char** argv)
 {
-    using clang::tooling::CommonOptionsParser;
-    using clang::tooling::ClangTool;
-
-    CommonOptionsParser options(argc, argv, MyToolCategory, MyToolUsage);
-    options.getCompilations();
+    CommonOptionsParser options(argc, argv, MyToolCategory);
     ClangTool tool(options.getCompilations(), options.getSourcePathList());
 
     MyPrinter printer;

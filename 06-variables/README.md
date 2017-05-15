@@ -1,4 +1,4 @@
-# Example 05. Get variables from AST
+# Get variables from AST
 
 ## Download LLVM Clang
 

@@ -8,13 +8,11 @@ CXXFLAGS = \
 	-std=c++14 \
 	-O2 \
 	-Wall \
-	-I../.. \
 	-I$(CLANG_DIR)/include \
 	-D__STDC_CONSTANT_MACROS \
 	-D__STDC_LIMIT_MACROS \
 	-fno-exceptions \
 	-fno-rtti
-EXTERNAL_CXXFLAGS = ""
 LDFLAGS = -L$(CLANG_DIR)/lib
 PRODUCT_NAME = negicco
 SOURCES = \

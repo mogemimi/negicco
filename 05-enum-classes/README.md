@@ -1,4 +1,4 @@
-# Negicco
+# Dump enum classes from AST
 
 ## Prerequisite - Downloading LLVM Clang
 
@@ -15,7 +15,8 @@ tar xaf clang+llvm-3.9.0-x86_64-apple-darwin
 ## Compiling the application
 
 ```shell
-git clone https://github.com/mogemimi/negicco.git && cd negicco
+git clone https://github.com/mogemimi/negicco.git
+cd negicco/04-enum-classes
 
 # Compiling for any platforms
 make build CLANG_DIR=/path/to/your/dir/clang+llvm-3.9.0
@@ -26,7 +27,7 @@ make build CLANG_DIR=/path/to/your/dir/clang+llvm-3.9.0-x86_64-apple-darwin
 
 ## Running the application
 
-#### Get enum definitions and comments from source code
+#### Dump enum classes and comments to yaml
 
 ```shell
 .negicco tests/enum_class.cpp -- -std=c++14
