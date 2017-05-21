@@ -19,3 +19,16 @@ Practicing and learning Clang LibTooling (still work in progress).
 - [08. Namespaces](#)
 - [09. Classes](#)
 - [10. Preprocessor Definitions](#)
+
+## How to build
+Use `CMake` to configure & build executables.
+
+ex:
+```shell
+mkdir BUILD
+cd BUILD
+cmake -G Ninja  \
+    -DLLVM_DIR=<directory contains LLVMConfig.cmake> \
+    -DClang_DIR=<directory contains ClangConfig.cmake>
+cmake --build BUILD
+```
