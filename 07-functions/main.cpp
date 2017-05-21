@@ -35,6 +35,7 @@
 #include "clang/Basic/FileSystemOptions.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/HeaderSearch.h"
+#include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/TargetOptions.h"
 #include "clang/Basic/TargetInfo.h"
@@ -103,17 +104,22 @@ int main(int argc, const char **argv)
         clang::TargetInfo::CreateTargetInfo(
             *pDiagnosticsEngine,
             targetOptions);
-
+#if CLANG_VERSION_MAJOR < 4
     llvm::IntrusiveRefCntPtr<clang::HeaderSearchOptions> hso;
+#else
+    auto hso = std::make_shared<clang::HeaderSearchOptions> () ;
+#endif
     clang::HeaderSearch headerSearch(hso,
                                      sourceManager,
                                      *pDiagnosticsEngine,
                                      languageOptions,
                                      pTargetInfo);
     clang::CompilerInstance compInst;
-
+#if CLANG_VERSION_MAJOR < 4
     llvm::IntrusiveRefCntPtr<clang::PreprocessorOptions> pOpts;
-
+#else
+    auto pOpts = std::make_shared<clang::PreprocessorOptions> () ;
+#endif
     clang::Preprocessor preprocessor(
         pOpts,
         *pDiagnosticsEngine,
